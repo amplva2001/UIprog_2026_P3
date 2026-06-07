@@ -37,31 +37,34 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
   z-index: 5; pointer-events: none;
 }
 #city-name {
-  font-size: clamp(13px, 1.4vw, 18px);
-  font-weight: 500;
-  opacity: 0.88;
+  font-size: clamp(12px, 1.3vw, 16px);
+  font-weight: 600;
+  opacity: 0.6;
   letter-spacing: -0.01em;
 }
 #city-coords {
-  font-size: clamp(9px, 0.85vw, 11px);
-  opacity: 0.36;
+  font-size: clamp(11px, 1.2vw, 15px);
+  opacity: 0.6;
   margin-top: clamp(6px, 0.9vh, 11px);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+}
+#aqi-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(5px, 0.6vw, 8px);
+  margin-top: clamp(6px, 0.9vh, 11px);
+  opacity: 0.6;
 }
 #aqi-face {
-  margin-top: clamp(6px, 0.9vh, 12px);
   line-height: 0;
 }
 #aqi-face svg {
-  width:  clamp(28px, 4.5vw, 48px);
-  height: clamp(28px, 4.5vw, 48px);
+  width:  clamp(13px, 1.4vw, 17px);
+  height: clamp(13px, 1.4vw, 17px);
 }
 #aqi-text {
-  font-size: clamp(9px, 0.85vw, 11px);
-  opacity: 0.36;
-  margin-top: clamp(3px, 0.3vh, 5px);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: clamp(11px, 1.2vw, 15px);
+  letter-spacing: 0.01em;
 }
 
 #mode-btn {
