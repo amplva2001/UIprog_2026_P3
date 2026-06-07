@@ -258,7 +258,7 @@ function nextCity() {
 }
 
 canvas.addEventListener('click', nextCity);
-setInterval(nextCity, 12_000);
+setInterval(nextCity, 5_000);
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 
