@@ -8,7 +8,6 @@ const ctx         = canvas.getContext('2d');
 const cityNameEl  = document.getElementById('city-name');
 const cityCoordEl = document.getElementById('city-coords');
 const aqiTextEl   = document.getElementById('aqi-text');
-const loadingEl   = document.getElementById('loading');
 const sunEl       = document.getElementById('sun');
 const moonEl      = document.getElementById('moon');
 
@@ -61,10 +60,10 @@ function toggleMode() {
 // ─── AQI categories ───────────────────────────────────────────────────────────
 
 const CAT_DEFS = [
-  { maxAqi:  50,      color: '#6699cc', label: 'good',           baseP:  22, hFrac: 0.26, turb: 0.02, maxVx: 0.35, speed: 0.45 },
-  { maxAqi: 100,      color: '#44aa55', label: 'moderate',       baseP:  65, hFrac: 0.48, turb: 0.10, maxVx: 0.90, speed: 0.80 },
-  { maxAqi: 250,      color: '#ffaa22', label: 'unhealthy',      baseP: 135, hFrac: 0.68, turb: 0.27, maxVx: 1.95, speed: 1.30 },
-  { maxAqi: Infinity, color: '#dd3322', label: 'very unhealthy', baseP: 230, hFrac: 0.86, turb: 0.44, maxVx: 2.85, speed: 2.00 },
+  { maxAqi:  50,      color: '#6699cc', label: 'good',           baseP:  22, hFrac: 0.26, turb: 0.01, maxVx: 0.20, speed: 0.22 },
+  { maxAqi: 100,      color: '#44aa55', label: 'moderate',       baseP:  65, hFrac: 0.48, turb: 0.05, maxVx: 0.50, speed: 0.40 },
+  { maxAqi: 250,      color: '#ffaa22', label: 'unhealthy',      baseP: 135, hFrac: 0.68, turb: 0.13, maxVx: 1.00, speed: 0.65 },
+  { maxAqi: Infinity, color: '#dd3322', label: 'very unhealthy', baseP: 230, hFrac: 0.86, turb: 0.22, maxVx: 1.50, speed: 1.00 },
 ];
 
 const VY   = 1.5;
