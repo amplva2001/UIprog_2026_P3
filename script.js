@@ -1,31 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Air Quality</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body class="dark">
-
-<div id="app" class="dark">
-  <canvas id="c"></canvas>
-  <div id="top-fade"></div>
-
-  <div id="header">
-    <div id="city-name"></div>
-    <div id="city-coords"></div>
-    <div id="aqi-text"></div>
-    <div id="mode-btn" onclick="toggleMode()">
-      <span id="sun">☀</span>
-      <span id="moon" class="on">☾</span>
-    </div>
-  </div>
-
-  <div id="loading">reading the air&hellip;</div>
-</div>
-
-<script>
 'use strict';
 
 // ─── DOM ──────────────────────────────────────────────────────────────────────
@@ -289,6 +261,3 @@ setInterval(nextCity, 12_000);
 
 render();
 showCity(CITIES[cityIdx]);
-</script>
-</body>
-</html>
