@@ -88,8 +88,8 @@ let CELL, PIX, pipeW, collarW, collarH, pipeX, collarTopY;
 
 function updateGeo() {
   const W = canvas.width, H = canvas.height;
-  CELL       = Math.max(12, Math.min(22, Math.round(Math.min(W, H) / 28)));
-  PIX        = CELL - 3;
+  CELL       = Math.max(18, Math.min(32, Math.round(Math.min(W, H) / 20)));
+  PIX        = CELL - 2;
   pipeW      = Math.min(90,  Math.round(W * 0.13));
   collarW    = Math.min(120, Math.round(W * 0.17));
   collarH    = Math.round(CELL * 1.5);
@@ -145,7 +145,14 @@ function emitStep() {
 
 // ─── Render ───────────────────────────────────────────────────────────────────
 
-function render() {
+let lastFrameTime = 0;
+const FRAME_MS = 1000 / 20; // 20 fps — retro choppiness
+
+function render(ts = 0) {
+  requestAnimationFrame(render);
+  if (ts - lastFrameTime < FRAME_MS) return;
+  lastFrameTime = ts;
+
   const W = canvas.width, H = canvas.height;
 
   ctx.fillStyle = dark ? '#000000' : '#ffffff';
@@ -178,7 +185,6 @@ function render() {
   ctx.fillRect(pipeX - collarW / 2, collarTopY,          collarW, collarH);
   ctx.fillRect(pipeX - pipeW  / 2, collarTopY + collarH, pipeW,   H - collarTopY - collarH + 4);
 
-  requestAnimationFrame(render);
 }
 
 // ─── Cities + data ────────────────────────────────────────────────────────────
@@ -239,8 +245,6 @@ async function showCity(city) {
     cityNameEl.textContent  = city.name;
     cityCoordEl.textContent = fmtCoords(city.lat, city.lon);
     aqiTextEl.textContent   = `US AQI ${aqi}  ·  ${activeCat.label}`;
-
-    loadingEl.classList.add('hidden');
   } catch (err) {
     console.warn(`${city.name} failed:`, err.message);
   } finally {
@@ -258,5 +262,5 @@ setInterval(nextCity, 12_000);
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 
-render();
+requestAnimationFrame(render);
 showCity(CITIES[cityIdx]);
