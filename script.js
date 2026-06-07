@@ -9,8 +9,7 @@ const cityNameEl  = document.getElementById('city-name');
 const cityCoordEl = document.getElementById('city-coords');
 const aqiTextEl   = document.getElementById('aqi-text');
 const aqiFaceEl   = document.getElementById('aqi-face');
-const sunEl       = document.getElementById('sun');
-const moonEl      = document.getElementById('moon');
+const modeIconEl  = document.getElementById('mode-icon');
 
 // ─── AQI faces ────────────────────────────────────────────────────────────────
 
@@ -84,8 +83,7 @@ function applyMode() {
   const cls = dark ? 'dark' : 'light';
   document.body.className = cls;
   appEl.className = cls;
-  sunEl.classList.toggle('on', !dark);
-  moonEl.classList.toggle('on',  dark);
+  modeIconEl.textContent = dark ? '☾' : '☀';
 }
 
 function setMode(lightMode) {
