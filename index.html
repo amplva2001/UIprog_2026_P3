@@ -10,22 +10,34 @@
       width: 100%; height: 100%;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    body.dark  { --bg: #000000; --fg: #ffffff; background: #000; color: #fff; }
-    body.light { --bg: #ffffff; --fg: #000000; background: #fff; color: #000; }
+    /* Outer background is the OPPOSITE of the animation */
+    body.dark  { background: #ffffff; }
+    body.light { background: #000000; }
 
-    canvas { position: fixed; inset: 0; display: block; }
+    /* 9:16 window — fits largest possible box inside the viewport */
+    #app {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 9 / 16;
+      width: min(100vw, calc(100vh * 9 / 16));
+    }
+    #app.dark  { --bg: #000000; --fg: #ffffff; background: #000; color: #fff; }
+    #app.light { --bg: #ffffff; --fg: #000000; background: #fff; color: #000; }
 
-    /* Gradient that keeps the header legible over any smoke color */
+    canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
     #top-fade {
-      position: fixed; top: 0; left: 0; right: 0; height: 32%;
+      position: absolute; top: 0; left: 0; right: 0; height: 32%;
       background: linear-gradient(to bottom, var(--bg) 30%, transparent 100%);
       pointer-events: none; z-index: 4;
     }
 
-    /* Centered header: city → coords → AQI → toggle */
     #header {
-      position: fixed; top: 0; left: 0; right: 0;
+      position: absolute; top: 0; left: 0; right: 0;
       display: flex; flex-direction: column; align-items: center;
       padding-top: clamp(18px, 2.5vh, 32px);
       gap: 0;
@@ -51,7 +63,6 @@
       letter-spacing: 0.06em;
     }
 
-    /* Mode toggle — pointer-events re-enabled */
     #mode-btn {
       pointer-events: all;
       margin-top: clamp(9px, 1.2vh, 14px);
@@ -67,7 +78,7 @@
     #mode-btn span.on { opacity: 1; }
 
     #loading {
-      position: fixed; inset: 0;
+      position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
       font-size: 10px; letter-spacing: 0.38em; text-transform: uppercase;
       opacity: 0.28; transition: opacity 0.7s; pointer-events: none; z-index: 6;
@@ -77,26 +88,29 @@
 </head>
 <body class="dark">
 
-<canvas id="c"></canvas>
-<div id="top-fade"></div>
+<div id="app" class="dark">
+  <canvas id="c"></canvas>
+  <div id="top-fade"></div>
 
-<div id="header">
-  <div id="city-name"></div>
-  <div id="city-coords"></div>
-  <div id="aqi-text"></div>
-  <div id="mode-btn" onclick="toggleMode()">
-    <span id="sun">☀</span>
-    <span id="moon" class="on">☾</span>
+  <div id="header">
+    <div id="city-name"></div>
+    <div id="city-coords"></div>
+    <div id="aqi-text"></div>
+    <div id="mode-btn" onclick="toggleMode()">
+      <span id="sun">☀</span>
+      <span id="moon" class="on">☾</span>
+    </div>
   </div>
-</div>
 
-<div id="loading">reading the air&hellip;</div>
+  <div id="loading">reading the air&hellip;</div>
+</div>
 
 <script>
 'use strict';
 
 // ─── DOM ──────────────────────────────────────────────────────────────────────
 
+const appEl       = document.getElementById('app');
 const canvas      = document.getElementById('c');
 const ctx         = canvas.getContext('2d');
 const cityNameEl  = document.getElementById('city-name');
@@ -110,8 +124,6 @@ const moonEl      = document.getElementById('moon');
 
 let dark = true;
 
-// Sunrise/sunset via the Wikipedia "Sunrise equation" (no external API needed).
-// Returns true if it is currently daytime at the given lat/lon.
 function isDaytime(lat, lon) {
   const now  = new Date();
   const JD   = now.getTime() / 86400000 + 2440587.5;
@@ -128,8 +140,8 @@ function isDaytime(lat, lon) {
   const latr = lat * Math.PI / 180;
   const cosHA = (Math.sin(-0.8333 * Math.PI / 180) - Math.sin(latr) * sinD)
               / (Math.cos(latr) * cosD);
-  if (cosHA <= -1) return true;  // midnight sun – always light
-  if (cosHA >= 1)  return false; // polar night  – always dark
+  if (cosHA <= -1) return true;
+  if (cosHA >= 1)  return false;
   const w0    = Math.acos(cosHA) * 180 / Math.PI;
   const rise  = (Jt - w0 / 360 - 2440587.5) * 86400000;
   const set   = (Jt + w0 / 360 - 2440587.5) * 86400000;
@@ -137,7 +149,9 @@ function isDaytime(lat, lon) {
 }
 
 function applyMode() {
-  document.body.className = dark ? 'dark' : 'light';
+  const cls = dark ? 'dark' : 'light';
+  document.body.className = cls;
+  appEl.className = cls;
   sunEl.classList.toggle('on', !dark);
   moonEl.classList.toggle('on',  dark);
 }
@@ -152,7 +166,7 @@ function toggleMode() {
   applyMode();
 }
 
-// ─── AQI categories (particle params scale with screen height) ────────────────
+// ─── AQI categories ───────────────────────────────────────────────────────────
 
 const CAT_DEFS = [
   { maxAqi:  50,      color: '#6699cc', label: 'good',           baseP:  22, hFrac: 0.26, turb: 0.05, maxVx: 0.55 },
@@ -165,7 +179,7 @@ const VY   = 1.5;
 let   CATS = [];
 
 function updateCats() {
-  const hScale = collarTopY / 648; // 648 = reference collarTopY on ~900px screen
+  const hScale = collarTopY / 648;
   CATS = CAT_DEFS.map(d => ({
     ...d,
     life: Math.round(collarTopY * d.hFrac / VY),
@@ -194,8 +208,8 @@ function updateGeo() {
 }
 
 function resize() {
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width  = appEl.clientWidth;
+  canvas.height = appEl.clientHeight;
   updateGeo();
 }
 resize();
@@ -249,7 +263,6 @@ function render() {
   particles = particles.filter(p => { p.update(); return p.alive; });
   emitStep();
 
-  // Grid-snapped, deduped, batched by color
   const occupied = new Set();
   const byColor  = new Map();
 
@@ -270,7 +283,6 @@ function render() {
     }
   }
 
-  // Pipe
   ctx.fillStyle = dark ? '#ffffff' : '#000000';
   ctx.fillRect(pipeX - collarW / 2, collarTopY,          collarW, collarH);
   ctx.fillRect(pipeX - pipeW  / 2, collarTopY + collarH, pipeW,   H - collarTopY - collarH + 4);
@@ -331,8 +343,6 @@ async function showCity(city) {
     const aqi  = json.current?.us_aqi ?? 0;
 
     activeCat = getCat(aqi);
-
-    // Auto day/night based on actual sunrise/sunset at this city
     setMode(isDaytime(city.lat, city.lon));
 
     cityNameEl.textContent  = city.name;
