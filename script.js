@@ -8,8 +8,49 @@ const ctx         = canvas.getContext('2d');
 const cityNameEl  = document.getElementById('city-name');
 const cityCoordEl = document.getElementById('city-coords');
 const aqiTextEl   = document.getElementById('aqi-text');
+const aqiFaceEl   = document.getElementById('aqi-face');
 const sunEl       = document.getElementById('sun');
 const moonEl      = document.getElementById('moon');
+
+// ─── AQI faces ────────────────────────────────────────────────────────────────
+
+const FACES = [
+  // 0 — good: heart eyes + wide smile
+  `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="16" r="14"/>
+    <path d="M9 12C9 10.5 10 10 11 10.5C11 10 12 10.5 12 12C12 14 11 15.5 11 15.5C11 15.5 9 14 9 12Z" fill="currentColor" stroke="none"/>
+    <path d="M20 12C20 10.5 21 10 22 10.5C22 10 23 10.5 23 12C23 14 22 15.5 22 15.5C22 15.5 20 14 20 12Z" fill="currentColor" stroke="none"/>
+    <path d="M7 21Q16 29 25 21" stroke-width="2.2"/>
+  </svg>`,
+  // 1 — moderate: dot eyes + gentle smile
+  `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="16" r="14"/>
+    <circle cx="11" cy="14" r="1.8" fill="currentColor" stroke="none"/>
+    <circle cx="21" cy="14" r="1.8" fill="currentColor" stroke="none"/>
+    <path d="M10 22Q16 26.5 22 22" stroke-width="2.2"/>
+  </svg>`,
+  // 2 — unhealthy: dot eyes + frown
+  `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="16" r="14"/>
+    <circle cx="11" cy="13" r="1.8" fill="currentColor" stroke="none"/>
+    <circle cx="21" cy="13" r="1.8" fill="currentColor" stroke="none"/>
+    <path d="M10 24Q16 19 22 24" stroke-width="2.2"/>
+  </svg>`,
+  // 3 — very unhealthy: horns + angry brows + evil grin with teeth
+  `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="18" r="13"/>
+    <path d="M8 10L5 4L14 11Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+    <path d="M24 10L27 4L18 11Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+    <path d="M9 17L13 15" stroke-width="2"/>
+    <path d="M23 17L19 15" stroke-width="2"/>
+    <circle cx="11" cy="19" r="1.5" fill="currentColor" stroke="none"/>
+    <circle cx="21" cy="19" r="1.5" fill="currentColor" stroke="none"/>
+    <path d="M10 25Q16 21 22 25"/>
+    <line x1="12" y1="25" x2="12" y2="28"/>
+    <line x1="16" y1="24" x2="16" y2="28"/>
+    <line x1="20" y1="25" x2="20" y2="28"/>
+  </svg>`,
+];
 
 // ─── Day / night mode ─────────────────────────────────────────────────────────
 
@@ -242,9 +283,11 @@ async function showCity(city) {
     activeCat = getCat(aqi);
     setMode(isDaytime(city.lat, city.lon));
 
+    const faceIdx = CAT_DEFS.findIndex(d => aqi <= d.maxAqi);
+    aqiFaceEl.innerHTML     = FACES[Math.min(faceIdx, 3)];
     cityNameEl.textContent  = city.name;
     cityCoordEl.textContent = fmtCoords(city.lat, city.lon);
-    aqiTextEl.textContent   = `US AQI ${aqi}  ·  ${activeCat.label}`;
+    aqiTextEl.textContent   = `US AQI ${aqi}`;
   } catch (err) {
     console.warn(`${city.name} failed:`, err.message);
   } finally {
