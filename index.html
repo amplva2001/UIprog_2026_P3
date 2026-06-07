@@ -169,10 +169,10 @@ function toggleMode() {
 // ─── AQI categories ───────────────────────────────────────────────────────────
 
 const CAT_DEFS = [
-  { maxAqi:  50,      color: '#6699cc', label: 'good',           baseP:  22, hFrac: 0.26, turb: 0.05, maxVx: 0.55 },
-  { maxAqi: 100,      color: '#44aa55', label: 'moderate',       baseP:  65, hFrac: 0.48, turb: 0.14, maxVx: 1.10 },
-  { maxAqi: 250,      color: '#ffaa22', label: 'unhealthy',      baseP: 135, hFrac: 0.68, turb: 0.27, maxVx: 1.95 },
-  { maxAqi: Infinity, color: '#dd3322', label: 'very unhealthy', baseP: 230, hFrac: 0.86, turb: 0.44, maxVx: 2.85 },
+  { maxAqi:  50,      color: '#6699cc', label: 'good',           baseP:  22, hFrac: 0.26, turb: 0.02, maxVx: 0.35, speed: 0.45 },
+  { maxAqi: 100,      color: '#44aa55', label: 'moderate',       baseP:  65, hFrac: 0.48, turb: 0.10, maxVx: 0.90, speed: 0.80 },
+  { maxAqi: 250,      color: '#ffaa22', label: 'unhealthy',      baseP: 135, hFrac: 0.68, turb: 0.27, maxVx: 1.95, speed: 1.30 },
+  { maxAqi: Infinity, color: '#dd3322', label: 'very unhealthy', baseP: 230, hFrac: 0.86, turb: 0.44, maxVx: 2.85, speed: 2.00 },
 ];
 
 const VY   = 1.5;
@@ -182,7 +182,7 @@ function updateCats() {
   const hScale = collarTopY / 648;
   CATS = CAT_DEFS.map(d => ({
     ...d,
-    life: Math.round(collarTopY * d.hFrac / VY),
+    life: Math.round(collarTopY * d.hFrac / (d.speed * VY)),
     maxP: Math.round(d.baseP * Math.sqrt(hScale)),
   }));
 }
@@ -203,7 +203,7 @@ function updateGeo() {
   collarW    = Math.min(120, Math.round(W * 0.17));
   collarH    = Math.round(CELL * 1.5);
   pipeX      = Math.round(W / 2);
-  collarTopY = Math.round(H * 0.72);
+  collarTopY = Math.round(H * 0.82);
   updateCats();
 }
 
@@ -226,7 +226,7 @@ class Particle {
     this.x       = pipeX + (Math.random() - 0.5) * pipeW * 0.72;
     this.y       = collarTopY - 2;
     this.vx      = (Math.random() - 0.5) * 0.3;
-    this.vy      = -(VY * (0.90 + Math.random() * 0.20));
+    this.vy      = -(activeCat.speed * VY * (0.90 + Math.random() * 0.20));
     this.life    = 0;
     this.maxLife = activeCat.life * (0.82 + Math.random() * 0.36);
     this.color   = activeCat.color;
@@ -363,7 +363,7 @@ function nextCity() {
 }
 
 canvas.addEventListener('click', nextCity);
-setInterval(nextCity, 45_000);
+setInterval(nextCity, 30_000);
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 
